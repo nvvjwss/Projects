@@ -395,3 +395,37 @@
 .project-card:nth-child(3) { animation-delay: 0.15s; }
 .project-card:nth-child(4) { animation-delay: 0.20s; }
 .project-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* ============================================
+   RESPONSIVE DESIGN (cards.css)
+   ============================================ */
+@media (max-width: 768px) {
+  .hero {
+    padding: 120px 24px 60px; /* ลด Padding บนมือถือ */
+  }
+
+  .section {
+    padding: 0 24px 80px; /* ลด Padding บนมือถือ */
+  }
+
+  /* ปรับ Grid การ์ดให้เป็น 1 คอลัมน์ */
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ลดช่องว่างของการ์ดในมือถือ (แทนที่ inline style) */
+  .projects-grid[style*="margin-bottom: 64px;"] {
+      margin-bottom: 32px !important; 
+  }
+
+  /* ปรับขนาด Modal Panel บนมือถือ */
+  .sub-panel-inner {
+    padding: 24px;
+    margin: 16px; /* กันขอบจอมือถือ */
+  }
+
+  /* ปรับ Grid ของการ์ดใน Modal ให้เป็น 1 คอลัมน์ */
+  .sub-cards {
+    grid-template-columns: 1fr;
+  }
+}

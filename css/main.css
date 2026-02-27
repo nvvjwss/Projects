@@ -119,3 +119,25 @@ footer span {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ============================================
+   RESPONSIVE DESIGN (main.css)
+   ============================================ */
+@media (max-width: 768px) {
+  /* ปรับ Navigation ให้เล็กลงและลดระยะขอบ */
+  nav {
+    padding: 16px 24px;
+  }
+
+  .nav-links {
+    gap: 16px; /* ลดระยะห่างระหว่างลิงก์ */
+  }
+
+  /* ปรับ Footer ให้ซ้อนกันเป็น 2 บรรทัด หรือลดระยะขอบ */
+  footer {
+    padding: 20px 24px;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
