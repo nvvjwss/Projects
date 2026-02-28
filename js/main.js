@@ -32,10 +32,55 @@ document.addEventListener('keydown', e => {
    ============================================ */
 function toggleGroup(header) {
   header.closest('.nav-group').classList.toggle('open');
+  saveSidebarState();
 }
 
 function toggleSubgroup(header) {
   header.closest('.nav-subgroup').classList.toggle('open');
+  saveSidebarState();
+}
+
+/* ============================================
+   Sidebar — sessionStorage state
+   ============================================ */
+function saveSidebarState() {
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar) return;
+
+  const openSubgroups = Array.from(sidebar.querySelectorAll('.nav-subgroup.open'))
+    .map(el => el.querySelector('.nav-subgroup-title')?.textContent.trim())
+    .filter(Boolean);
+
+  const openGroups = Array.from(sidebar.querySelectorAll('.nav-group.open'))
+    .map(el => el.querySelector('.nav-group-title')?.textContent.trim())
+    .filter(Boolean);
+
+  sessionStorage.setItem('sidebarState', JSON.stringify({
+    scroll: sidebar.scrollTop,
+    subgroups: openSubgroups,
+    groups: openGroups
+  }));
+}
+
+function restoreSidebarState() {
+  const raw = sessionStorage.getItem('sidebarState');
+  if (!raw) return;
+
+  const { scroll, subgroups, groups } = JSON.parse(raw);
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar) return;
+
+  sidebar.querySelectorAll('.nav-subgroup').forEach(el => {
+    const title = el.querySelector('.nav-subgroup-title')?.textContent.trim();
+    el.classList.toggle('open', subgroups.includes(title));
+  });
+
+  sidebar.querySelectorAll('.nav-group').forEach(el => {
+    const title = el.querySelector('.nav-group-title')?.textContent.trim();
+    el.classList.toggle('open', groups.includes(title));
+  });
+
+  sidebar.scrollTop = scroll;
 }
 
 /* ============================================
@@ -82,6 +127,13 @@ function loadSidebar() {
           }
         }
       });
+
+      // restore state จาก sessionStorage
+      restoreSidebarState();
+
+      // save scroll position เวลา scroll sidebar
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) sidebar.addEventListener('scroll', saveSidebarState);
 
       // เรียกใช้งาน Highlight เมนูตอนเลื่อนหน้าจอ
       initScrollHighlight();
