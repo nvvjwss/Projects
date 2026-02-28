@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การติดตั้งด้วย Isaac Sim Pip Package — IsaacLab Docs (TH)</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/main.css">
+  <link rel="stylesheet" href="../../css/docs.css">
+  <script src="../../js/main.js" defer></script>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar-container"></div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="openSidebar()">☰</button>
+    <div class="breadcrumb">
+      <span>Isaac Lab</span>
+      <span class="sep">›</span>
+      <span>Local Installation</span>
+      <span class="sep">›</span>
+      <span>Installation using Isaac Sim Pip Package</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== SECTION 1: Introduction ===== -->
+    <div class="tutorial-section" id="pip-intro">
+      <div class="section-badge">Installation</div>
+      <h1>การติดตั้งโดยใช้ Isaac Sim Pip Package</h1>
+
+      <p>ขั้นตอนต่อไปนี้จะติดตั้ง Isaac Sim จาก pip ก่อน แล้วจึงติดตั้ง Isaac Lab จาก source code</p>
+
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div>
+          <div class="callout-title">ข้อควรระวัง</div>
+          <p>การติดตั้ง Isaac Sim ด้วย pip ต้องการความเข้ากันได้กับ GLIBC เวอร์ชัน 2.35 ขึ้นไป เพื่อตรวจสอบเวอร์ชัน GLIBC บนระบบของคุณ ให้ใช้คำสั่ง <code>ldd --version</code></p>
+          <p>ซึ่งอาจทำให้เกิดปัญหาความเข้ากันได้กับ Linux distributions บางตัว ตัวอย่างเช่น Ubuntu 20.04 LTS มี GLIBC 2.31 เป็นค่าเริ่มต้น หากพบปัญหาความเข้ากันได้ เราแนะนำให้ทำตามวิธีการ Isaac Sim Binaries Installation แทน</p>
+        </div>
+      </div>
+
+      <div class="callout callout-note">
+        <div class="callout-icon">ℹ️</div>
+        <div>
+          <div class="callout-title">หมายเหตุ</div>
+          <p>หากคุณวางแผนที่จะตั้งค่า Visual Studio Code ในภายหลัง เราแนะนำให้ทำตามวิธีการ Isaac Sim Binaries Installation แทน</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 2: Installing Isaac Sim ===== -->
+    <div class="tutorial-section" id="pip-install-sim">
+      <div class="section-badge">Step 1</div>
+      <h1>การติดตั้ง Isaac Sim</h1>
+
+      <p>ตั้งแต่ Isaac Sim 4.0 เป็นต้นไป สามารถติดตั้ง Isaac Sim โดยใช้ pip ได้ วิธีนี้ทำให้ติดตั้ง Isaac Sim ได้ง่ายขึ้นโดยไม่จำเป็นต้องดาวน์โหลด Isaac Sim binaries หากพบปัญหาใดๆ กรุณารายงานไปที่ Isaac Sim Forums</p>
+
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div>
+          <div class="callout-title">ข้อควรระวัง</div>
+          <p>บน Windows อาจจำเป็นต้องเปิดใช้งาน long path support เพื่อหลีกเลี่ยงข้อผิดพลาดในการติดตั้งที่เกิดจากข้อจำกัดของ OS</p>
+        </div>
+      </div>
+
+      <h2>การเตรียม Python Environment</h2>
+
+      <p>การสร้าง Python environment เฉพาะเป็นสิ่งที่แนะนำอย่างยิ่ง ซึ่งช่วยให้:</p>
+      <ul>
+        <li>หลีกเลี่ยงความขัดแย้งกับ system Python หรือโปรเจกต์อื่นๆ ที่ติดตั้งบนเครื่อง</li>
+        <li>แยก dependencies ออกจากกัน เพื่อให้การอัปเกรด packages หรือการทดลองในโปรเจกต์อื่นๆ ไม่ทำให้ Isaac Sim เสียหาย</li>
+        <li>จัดการ environments หลายตัวสำหรับการตั้งค่าที่มี dependencies เวอร์ชันต่างกันได้ง่ายขึ้น</li>
+        <li>ทำให้ reproducibility ง่ายขึ้น — environment มีเฉพาะ packages ที่จำเป็นสำหรับโปรเจกต์ปัจจุบัน ทำให้แชร์การตั้งค่ากับเพื่อนร่วมงานหรือรันบนเครื่องอื่นได้ง่ายขึ้น</li>
+      </ul>
+
+      <p>คุณสามารถเลือก package manager ต่างๆ เพื่อสร้าง virtual environment:</p>
+      <ul>
+        <li><strong>UV</strong>: package manager สำหรับ Python ที่ทันสมัย รวดเร็ว และปลอดภัย</li>
+        <li><strong>Conda</strong>: package manager สำหรับ Python ที่รองรับหลาย platform และหลายภาษา</li>
+        <li><strong>venv</strong>: standard library สำหรับสร้าง virtual environments ใน Python</li>
+      </ul>
+
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div>
+          <div class="callout-title">ข้อควรระวัง — Python Version</div>
+          <p>Python version ของ virtual environment ต้องตรงกับ Python version ของ Isaac Sim:</p>
+          <ul>
+            <li>สำหรับ Isaac Sim 5.X ต้องการ Python เวอร์ชัน <strong>3.11</strong></li>
+            <li>สำหรับ Isaac Sim 4.X ต้องการ Python เวอร์ชัน <strong>3.10</strong></li>
+          </ul>
+          <p>การใช้ Python เวอร์ชันที่แตกต่างออกไปจะทำให้เกิดข้อผิดพลาดเมื่อรัน Isaac Lab</p>
+        </div>
+      </div>
+
+      <p>คำแนะนำต่อไปนี้สำหรับ Isaac Sim 5.X ซึ่งต้องการ Python 3.11 หากต้องการติดตั้ง Isaac Sim 4.5 กรุณาปรับแก้คำแนะนำให้ใช้ Python 3.10 แทน</p>
+
+      <p>สร้าง virtual environment โดยใช้ package manager ตัวใดตัวหนึ่ง:</p>
+
+      <h3>Conda Environment</h3>
+      <p>เพื่อติดตั้ง conda กรุณาทำตามคำแนะนำที่นี่ คุณสามารถสร้าง Isaac Lab environment โดยใช้คำสั่งต่อไปนี้ เราแนะนำให้ใช้ Miniconda เนื่องจากเป็นระบบจัดการ environment ที่เบาและประหยัดทรัพยากร</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Conda</span>
+        </div>
+        <pre><code><span class="prompt">$</span> conda create -n env_isaaclab python=3.11
+<span class="prompt">$</span> conda activate env_isaaclab</code></pre>
+      </div>
+
+      <h3>venv Environment</h3>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — venv (Linux)</span>
+        </div>
+        <pre><code><span class="prompt">$</span> python3.11 -m venv env_isaaclab
+<span class="prompt">$</span> source env_isaaclab/bin/activate</code></pre>
+      </div>
+
+      <h3>UV Environment (experimental)</h3>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — UV (Linux)</span>
+        </div>
+        <pre><code><span class="prompt">$</span> uv venv env_isaaclab --python 3.11
+<span class="prompt">$</span> source env_isaaclab/bin/activate</code></pre>
+      </div>
+
+      <p>ตรวจสอบให้แน่ใจว่ามี pip เวอร์ชันล่าสุดติดตั้งอยู่ หากต้องการอัปเดต pip ให้รันคำสั่งต่อไปนี้จากภายใน virtual environment:</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="prompt">$</span> pip install --upgrade pip</code></pre>
+      </div>
+
+      <h2>การติดตั้ง Dependencies</h2>
+
+      <div class="callout callout-note">
+        <div class="callout-icon">ℹ️</div>
+        <div>
+          <div class="callout-title">หมายเหตุ</div>
+          <p>ในกรณีที่ใช้ UV เพื่อสร้าง virtual environment กรุณาแทน <code>pip</code> ด้วย <code>uv pip</code> ในคำสั่งต่อไปนี้</p>
+        </div>
+      </div>
+
+      <p>ติดตั้ง Isaac Sim pip packages:</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash</span>
+        </div>
+        <pre><code><span class="prompt">$</span> pip install "isaacsim[all,extscache]==5.1.0" --extra-index-url https://pypi.nvidia.com</code></pre>
+      </div>
+
+      <p>ติดตั้ง CUDA-enabled PyTorch build ที่ตรงกับ system architecture ของคุณ:</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux (x86_64)</span>
+        </div>
+        <pre><code><span class="prompt">$</span> pip install -U torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128</code></pre>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Windows (x86_64)</span>
+        </div>
+        <pre><code><span class="prompt">></span> pip install -U torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128</code></pre>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux (aarch64)</span>
+        </div>
+        <pre><code><span class="prompt">$</span> pip install -U torch==2.7.0 torchvision==0.22.0</code></pre>
+      </div>
+
+      <h2>การตรวจสอบการติดตั้ง Isaac Sim</h2>
+
+      <ol>
+        <li>ตรวจสอบให้แน่ใจว่า virtual environment ของคุณถูก activate แล้ว (ถ้ามี)</li>
+        <li>ตรวจสอบว่า simulator ทำงานตามที่คาดไว้:</li>
+      </ol>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash</span>
+        </div>
+        <pre><code><span class="cm"># หมายเหตุ: สามารถส่ง argument "--help" เพื่อดู arguments ทั้งหมดที่เป็นไปได้</span>
+<span class="prompt">$</span> isaacsim</code></pre>
+      </div>
+
+      <p>นอกจากนี้ยังสามารถรันด้วย experience file เฉพาะได้:</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash</span>
+        </div>
+        <pre><code><span class="cm"># experience files สามารถเป็น absolute path หรือ relative path ที่ค้นหาใน isaacsim/apps หรือ omni/apps</span>
+<span class="prompt">$</span> isaacsim isaacsim.exp.full.kit</code></pre>
+      </div>
+
+      <div class="callout callout-note">
+        <div class="callout-icon">ℹ️</div>
+        <div>
+          <div class="callout-title">หมายเหตุ</div>
+          <p>เมื่อรัน Isaac Sim เป็นครั้งแรก extensions ที่ต้องพึ่งพาทั้งหมดจะถูกดึงมาจาก registry กระบวนการนี้อาจใช้เวลามากกว่า 10 นาที และจำเป็นต้องทำในการรันครั้งแรกของแต่ละ experience file เมื่อ extensions ถูก pull มาแล้ว การรันครั้งต่อๆ ไปโดยใช้ experience file เดียวกันจะใช้ extensions ที่ cache ไว้</p>
+        </div>
+      </div>
+
+      <div class="callout callout-warn">
+        <div class="callout-icon">⚠️</div>
+        <div>
+          <div class="callout-title">ข้อควรระวัง — การยอมรับ EULA</div>
+          <p>การรันครั้งแรกจะแจ้งให้ผู้ใช้ยอมรับ Nvidia Omniverse License Agreement ในการยอมรับ EULA ให้ตอบ <strong>Yes</strong> เมื่อถูกแจ้งด้วยข้อความด้านล่าง:</p>
+        </div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash</span>
+        </div>
+        <pre><code>By installing or using Isaac Sim, I agree to the terms of NVIDIA OMNIVERSE LICENSE AGREEMENT (EULA)
+in https://docs.isaacsim.omniverse.nvidia.com/latest/common/NVIDIA_Omniverse_License_Agreement.html
+Do you accept the EULA? (Yes/No): Yes</code></pre>
+      </div>
+
+      <p>หาก simulator ไม่ทำงานหรือ crash ขณะทำตามคำแนะนำข้างต้น แสดงว่ามีการกำหนดค่าบางอย่างที่ไม่ถูกต้อง เพื่อ debug และแก้ไขปัญหา กรุณาตรวจสอบ Isaac Sim documentation และ Isaac Sim Forums</p>
+    </div>
+
+    <!-- ===== SECTION 3: Installing Isaac Lab ===== -->
+    <div class="tutorial-section" id="pip-install-lab">
+      <div class="section-badge">Step 2</div>
+      <h1>การติดตั้ง Isaac Lab</h1>
+
+      <h2>การ Clone Isaac Lab</h2>
+
+      <div class="callout callout-note">
+        <div class="callout-icon">ℹ️</div>
+        <div>
+          <div class="callout-title">หมายเหตุ</div>
+          <p>เราแนะนำให้ fork Isaac Lab repository เพื่อ contribute ให้กับโปรเจกต์ แต่ไม่จำเป็นสำหรับการใช้ framework หากคุณ fork กรุณาแทน <code>isaac-sim</code> ด้วย username ของคุณในคำแนะนำต่อไปนี้</p>
+        </div>
+      </div>
+
+      <p>Clone Isaac Lab repository เข้าไปใน workspace ของโปรเจกต์:</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — SSH</span>
+        </div>
+        <pre><code><span class="prompt">$</span> git clone https://github.com/isaac-sim/IsaacLab.git</code></pre>
+      </div>
+
+      <p>เราให้ helper executable <code>isaaclab.sh</code> และ <code>isaaclab.bat</code> สำหรับ Linux และ Windows ตามลำดับ ซึ่งให้ utilities ในการจัดการ extensions</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="prompt">$</span> ./isaaclab.sh --help
+
+usage: isaaclab.sh [-h] [-i] [-f] [-p] [-s] [-t] [-o] [-v] [-d] [-n] [-c] -- Utility to manage Isaac Lab.
+
+optional arguments:
+   -h, --help           Display the help content.
+   -i, --install [LIB]  Install the extensions inside Isaac Lab and learning frameworks (rl_games, rsl_rl, sb3, skrl) as extra dependencies. Default is 'all'.
+   -f, --format         Run pre-commit to format the code and check lints.
+   -p, --python         Run the python executable provided by Isaac Sim or virtual environment (if active).
+   -s, --sim            Run the simulator executable (isaac-sim.sh) provided by Isaac Sim.
+   -t, --test           Run all python pytest tests.
+   -o, --docker         Run the docker container helper script (docker/container.sh).
+   -v, --vscode         Generate the VSCode settings file from template.
+   -d, --docs           Build the documentation from source using sphinx.
+   -n, --new            Create a new external project or internal task from template.
+   -c, --conda [NAME]   Create the conda environment for Isaac Lab. Default name is 'env_isaaclab'.
+   -u, --uv [NAME]      Create the uv environment for Isaac Lab. Default name is 'env_isaaclab'.</code></pre>
+      </div>
+
+      <h2>การติดตั้ง</h2>
+
+      <p>ติดตั้ง dependencies โดยใช้ apt (บน Linux เท่านั้น):</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="cm"># dependency เหล่านี้จำเป็นสำหรับ robomimic ซึ่งไม่มีให้ใช้งานบน Windows</span>
+<span class="prompt">$</span> sudo apt install cmake build-essential</code></pre>
+      </div>
+
+      <p>รัน install command ที่จะวนซ้ำ extensions ทั้งหมดใน source directory และติดตั้งโดยใช้ pip (พร้อม <code>--editable</code> flag):</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="prompt">$</span> ./isaaclab.sh --install <span class="cm"># หรือ "./isaaclab.sh -i"</span></code></pre>
+      </div>
+
+      <p>โดยค่าเริ่มต้น คำสั่งข้างต้นจะติดตั้ง learning frameworks ทั้งหมด ซึ่งรวมถึง <code>rl_games</code>, <code>rsl_rl</code>, <code>sb3</code>, <code>skrl</code>, <code>robomimic</code></p>
+
+      <p>หากต้องการติดตั้งเฉพาะ framework เฉพาะ สามารถส่งชื่อ framework เป็น argument ได้ ตัวอย่างเช่น หากต้องการติดตั้งเฉพาะ <code>rl_games</code> framework:</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="prompt">$</span> ./isaaclab.sh --install rl_games  <span class="cm"># หรือ "./isaaclab.sh -i rl_games"</span></code></pre>
+      </div>
+
+      <p>ตัวเลือกที่ถูกต้องได้แก่ <code>all</code>, <code>rl_games</code>, <code>rsl_rl</code>, <code>sb3</code>, <code>skrl</code>, <code>robomimic</code> และ <code>none</code> หาก <code>none</code> ถูกส่ง จะไม่มี learning frameworks ถูกติดตั้ง</p>
+
+      <h2>การตรวจสอบการติดตั้ง Isaac Lab</h2>
+
+      <p>เพื่อยืนยันว่าการติดตั้งสำเร็จ ให้รันคำสั่งต่อไปนี้จาก root ของ repository:</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="cm"># ตัวเลือกที่ 1: ใช้ isaaclab.sh executable</span>
+<span class="cm"># หมายเหตุ: ใช้ได้กับทั้ง bundled python และ virtual environment</span>
+<span class="prompt">$</span> ./isaaclab.sh -p scripts/tutorials/00_sim/create_empty.py
+
+<span class="cm"># ตัวเลือกที่ 2: ใช้ python ใน virtual environment</span>
+<span class="prompt">$</span> python scripts/tutorials/00_sim/create_empty.py</code></pre>
+      </div>
+
+      <p>คำสั่งข้างต้นควรเปิด simulator และแสดงหน้าต่างที่มี black viewport คุณสามารถออกจาก script ได้โดยกด <code>Ctrl+C</code> บน terminal บนเครื่อง Windows กรุณาหยุด process จาก Command Prompt โดยใช้ <code>Ctrl+Break</code> หรือ <code>Ctrl+fn+B</code></p>  
+      <div class="callout callout-note">
+        <div class="callout-icon">✅</div>
+        <div>
+          <div class="callout-title">การติดตั้งสำเร็จ!</div>
+          <p>หากเห็นหน้าต่าง simulator พร้อม black viewport แสดงว่าการติดตั้งสำเร็จแล้ว</p>
+          <img src="../../assets/images/verifyinstall.jpg" alt="ecosystem-dark" style="width:100%; border-radius:6px; margin: 16px 0;">
+
+        </div>
+      </div>
+
+      <div class="callout callout-note">
+        <div class="callout-icon">ℹ️</div>
+        <div>
+          <div class="callout-title">หมายเหตุ</div>
+          <p>หากพบ error <code>ModuleNotFoundError: No module named 'isaacsim'</code> กรุณาตรวจสอบให้แน่ใจว่า virtual environment ถูก activate และได้รัน <code>source _isaac_sim/setup_conda_env.sh</code> แล้ว (สำหรับ uv ด้วย)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 4: Train a robot! ===== -->
+    <div class="tutorial-section" id="pip-train">
+      <div class="section-badge">Next Steps</div>
+      <h1>ลอง Train Robot กันเลย!</h1>
+
+      <p>ตอนนี้คุณสามารถใช้ Isaac Lab ในการ train robot ผ่าน Reinforcement Learning! วิธีที่รวดเร็วที่สุดในการใช้ Isaac Lab คือผ่าน predefined workflows โดยใช้หนึ่งใน Batteries-included robot tasks รันคำสั่งต่อไปนี้เพื่อ train ant ให้เดิน! เราแนะนำให้เพิ่ม <code>--headless</code> เพื่อให้ training เร็วขึ้น</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="prompt">$</span> ./isaaclab.sh -p scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Ant-v0 --headless</code></pre>
+      </div>
+
+      <p>… หรือ robot dog!</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
+          <span class="terminal-title">bash — Linux</span>
+        </div>
+        <pre><code><span class="prompt">$</span> ./isaaclab.sh -p scripts/reinforcement_learning/rsl_rl/train.py --task=Isaac-Velocity-Rough-Anymal-C-v0 --headless</code></pre>
+      </div>
+
+      <p>Isaac Lab มีเครื่องมือที่คุณต้องการในการสร้าง Tasks และ Workflows เองสำหรับทุกความต้องการของโปรเจกต์ ลองดู How-to Guides เช่น <strong>Adding your own learning Library</strong> หรือ <strong>Wrapping Environments</strong> สำหรับรายละเอียดเพิ่มเติม</p>
+      <img src="../../assets/images/isaac_ants_example.jpg" alt="ecosystem-dark" style="width:100%; border-radius:6px; margin: 16px 0;">
+
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
